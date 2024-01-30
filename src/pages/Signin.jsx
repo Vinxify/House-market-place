@@ -8,7 +8,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import ArrowRightIcon from "../assets/svg/keyboardArrowRightIcon.svg?react";
 import visibilityIcon from "../assets/svg/visibilityIcon.svg";
 
-function Signin() {
+function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -101,4 +101,4 @@ function Signin() {
   );
 }
 
-export default Signin;
+export default SignIn;
