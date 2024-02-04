@@ -13,6 +13,7 @@ import { db } from "../firebase.config";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { v4 as uuidv4 } from "uuid";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
 function CreatingListing() {
   const [loading, setLoading] = useState(false);
@@ -57,9 +58,8 @@ function CreatingListing() {
     e.preventDefault();
 
     setLoading(true);
-    console.log(formData);
 
-    if (discountedPrice >= regularPrice) {
+    if (+discountedPrice >= +regularPrice) {
       setLoading(false);
       toast.error("Discounted price needs to be less than regular price");
       return;
@@ -71,101 +71,94 @@ function CreatingListing() {
       return;
     }
 
-    // let geolocation = {};
-    // let location;
+    let geolocation = {};
+    let location;
 
-    // if (geolocationEnabled) {
-    //   const response = await fetch(
-    //     `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyAj1lg0Thhg1wWSABx9pe61HJteo4ysLII`
-    //   );
-    //   const data = await response.json();
-    //   console.log(data);
-
-    //   geolocation.lat = data.results[0].geometry.location.lat ?? 0;
-    //   geolocation.lng = data.results[0].geometry.location.lng ?? 0;
-    // } else {
-    //   geolocation.lat = latitude;
-    //   geolocation.lng = longitude;
-    //   location = address;
-    // }
-
-    // store image in firebase
+    geolocation.lat = latitude;
+    geolocation.lng = longitude;
+    location = address;
 
     const storageImage = async (image) => {
       return new Promise((resolve, reject) => {
-        let recievedData;
         const storage = getStorage();
         const fileName = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
         const storageRef = ref(storage, "images/" + fileName);
-
-        console.log(storageRef);
 
         const uploadTask = uploadBytesResumable(storageRef, image);
 
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            // Upload progress tracking
             const progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log("Upload is " + progress + "% done");
-            switch (snapshot.state) {
-              case "paused":
-                console.log("Upload is paused");
-                break;
-              case "running":
-                console.log("Upload is running");
-                break;
-            }
           },
           (error) => {
+            // Upload error handling
             reject(error);
-            throw error;
-            switch (error.code) {
-              case "storage/unauthorized":
-                // User doesn't have permission to access the object
-                break;
-              case "storage/canceled":
-                // User canceled the upload
-                break;
-
-              // ...
-
-              case "storage/unknown":
-                // Unknown error occurred, inspect error.serverResponse
-                break;
-            }
+            console.error("Error uploading image:", error);
           },
           () => {
-            // Upload completed successfully, now we can get the download URL
-
+            // Upload completed successfully, get download URL
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
               resolve(downloadURL);
-              recievedData = downloadURL;
             });
           }
         );
-        return recievedData;
       });
     };
 
-    debugger;
-    const imgUrls = await Promise.all(
-      [...images].map((image) => storageImage(image))
-    )
-      .then(() => {
-        toast.success("good");
-      })
-      .catch(() => {
-        setLoading(false);
+    const uploadImages = async () => {
+      try {
+        // Upload all images concurrently and wait for all promises to resolve
+        const imgUpload = await Promise.all(
+          [...images].map((image) => storageImage(image))
+        );
+
+        console.log(imgUpload);
+        return imgUpload;
+      } catch (error) {
+        console.error("Error uploading images:", error);
         toast.error("Images not uploaded");
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    // Call the uploadImages function
+    const imgUrls = await uploadImages();
     console.log(imgUrls);
-    console.log(images);
 
+    const formDataCopy = {
+      ...formData,
+      imgUrls,
+      location,
+      geolocation,
+      timestamp: serverTimestamp(),
+    };
+
+    console.log(formDataCopy);
+    console.log(formDataCopy.timestamp);
+
+    delete formDataCopy.images;
+    delete formDataCopy.address;
+    delete formDataCopy.latitude;
+    delete formDataCopy.longitude;
+
+    console.log(location);
+    !formDataCopy.offer && delete formDataCopy.discountedPrice;
+
+    const docRef = await addDoc(collection(db, "listing"), formDataCopy);
     setLoading(false);
+    toast.success("Listing saved");
+
+    console.log(docRef.id);
+
+    navigate(`/category/${formDataCopy.type}/${docRef.id}`);
   };
+
+  // Onchange function
 
   const onMutate = (e) => {
     let boolean = null;

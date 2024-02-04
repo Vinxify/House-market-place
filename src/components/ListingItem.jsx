@@ -6,6 +6,7 @@ import bathtubIcon from "../assets/svg/bathtubIcon.svg";
 import React from "react";
 
 function ListingItem({ listing, id, onDelete }) {
+  console.log(listing);
   return (
     <li className='categoryListing'>
       <Link
@@ -13,7 +14,7 @@ function ListingItem({ listing, id, onDelete }) {
         className='categoryListingLink'
       >
         <img
-          src={listing.image[1]}
+          src={listing.imgUrls[1]}
           alt={listing.name}
           className='categoryListingImg'
         />

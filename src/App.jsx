@@ -12,9 +12,11 @@ import ForgetPassword from "./pages/ForgetPassword";
 import Offers from "./pages/Offers";
 import Profile from "./pages/Profile";
 import Category from "./pages/Category";
+import Listing from "./pages/Listing";
 
 import SignUp from "./pages/Signup";
 import SignIn from "./pages/Signin";
+import Contact from "./pages/Contact";
 // import Signin from "./pages/Signin";
 import Navbar from "./components/Navbar";
 
@@ -33,6 +35,8 @@ function App() {
           <Route path='/sign-up' element={<SignUp />} />
           <Route path='/forgot-password' element={<ForgetPassword />} />
           <Route path='/create-listing' element={<CreatingListing />} />
+          <Route path='/category/:category/:listingId' element={<Listing />} />
+          <Route path='/contact/:landlordId' element={<Contact />} />
         </Routes>
 
         <Navbar />
