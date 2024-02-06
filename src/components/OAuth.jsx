@@ -26,7 +26,6 @@ function OAuth() {
 
           timestamp: serverTimestamp(),
         });
-        console.log(timestamp);
       }
       navigate("/");
     } catch (error) {

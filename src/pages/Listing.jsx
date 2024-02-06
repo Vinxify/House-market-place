@@ -10,33 +10,33 @@ import shareIcon from "../assets/svg/shareIcon.svg";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { Map } from "leaflet";
 
+import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/bundle";
+
 function Listing() {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [shareLinkCopied, setShareLinkCopied] = useState(true);
+  const [shareLinkCopied, setShareLinkCopied] = useState(false);
 
   const navigate = useNavigate();
   const params = useParams();
   const auth = getAuth();
 
-  const normalPrice = +listing.regularPrice;
-  const disPrice = +listing.discountedPrice;
-
   useEffect(() => {
     const fetchListing = async () => {
       const docRef = doc(db, "listing", params.listingId);
       const docSnap = await getDoc(docRef);
-      console.log(docSnap);
 
       if (docSnap.exists()) {
-        console.log(docSnap.data());
         setListing(docSnap.data());
         setLoading(false);
       }
     };
 
     fetchListing();
-  }, [navigate, params.listingId]);
+  }, [params.listingId]);
 
   const handleShareClick = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -51,6 +51,42 @@ function Listing() {
   }
   return (
     <main>
+      <Swiper
+        slidesPerView={1}
+        modules={[Navigation, Pagination, Scrollbar, A11y]}
+        pagination={{ clickable: true }}
+        onSlideChange={() => {
+          /*...*/
+        }}
+        onReachEnd={() => {
+          /*...*/
+        }}
+      >
+        {listing.imgUrls.map((url, index) => (
+          <SwiperSlide key={index}>
+            <div
+              className='img'
+              style={{
+                maxHeight: "100px",
+              }}
+            >
+              <div
+                style={{
+                  backgroundImage: `url(${listing.imgUrls[index]})`,
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "cover",
+                  height: "25vh",
+
+                  objectFit: "cover",
+                }}
+                className='swiperSildeDiv'
+              ></div>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
       <div className='shareIconDiv' onClick={handleShareClick}>
         <img src={shareIcon} alt='' />
       </div>
@@ -75,7 +111,10 @@ function Listing() {
         </p>
 
         {listing.offer && (
-          <p className='discountPrice'>${normalPrice - disPrice} discount</p>
+          <p className='discountPrice'>
+            ${Number(listing.regularPrice) - Number(listing.discountedPrice)}{" "}
+            discount
+          </p>
         )}
 
         <ul className='listingDetailsList'>

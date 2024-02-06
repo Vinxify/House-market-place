@@ -19,6 +19,7 @@ import SignIn from "./pages/Signin";
 import Contact from "./pages/Contact";
 // import Signin from "./pages/Signin";
 import Navbar from "./components/Navbar";
+import EditListing from "./pages/EditListing";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path='/create-listing' element={<CreatingListing />} />
           <Route path='/category/:category/:listingId' element={<Listing />} />
           <Route path='/contact/:landlordId' element={<Contact />} />
+          <Route path='/edit-listing/:listingId' element={<EditListing />} />
         </Routes>
 
         <Navbar />

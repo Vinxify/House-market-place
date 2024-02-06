@@ -11,20 +11,15 @@ function Contact() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const params = useParams();
-  console.log(params.landlordId);
 
   useEffect(() => {
     const getLandlord = async () => {
       try {
         const docRef = doc(db, "users", params.landlordId);
-        console.log(docRef);
-
+        
         const docSnap = await getDoc(docRef);
 
-        console.log(docSnap);
-        console.log(!docSnap.exists());
-        console.log(docSnap.data());
-
+        
         if (docSnap.exists()) {
           setLandlord(docSnap.data());
         } else {

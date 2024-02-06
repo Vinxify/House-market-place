@@ -10,14 +10,15 @@ import {
 } from "firebase/storage";
 
 import { db } from "../firebase.config";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { v4 as uuidv4 } from "uuid";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { doc, updateDoc, getDoc, serverTimestamp } from "firebase/firestore";
 
-function CreatingListing() {
+function EditListing() {
   const [loading, setLoading] = useState(false);
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
+  const [listing, setListing] = useState(false);
   const [formData, setFormData] = useState({
     type: "rent",
     name: "",
@@ -52,7 +53,38 @@ function CreatingListing() {
 
   const auth = getAuth();
   const navigate = useNavigate();
+  const params = useParams();
   const isMounted = useRef(true);
+
+  // Redirect if listing is not user's
+  useEffect(() => {
+    if (listing && listing.userRef !== auth.currentUser) {
+      toast.error("You can not edit that listing");
+      navigate("/");
+    }
+  }, []);
+
+  //  Edit listing
+  useEffect(() => {
+    setLoading(true);
+    const fetchListing = async () => {
+      const docRef = doc(db, "listing", params.listingId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setListing(docSnap.data());
+        setFormData({
+          ...docSnap.data(),
+          address: docSnap.data().location,
+          latitude: docSnap.data().geolocation.lat,
+          longitude: docSnap.data().geolocation.lng,
+        });
+        setLoading(false);
+      } else {
+        navigate("/");
+      }
+    };
+    fetchListing();
+  }, [params.listingId, navigate]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -143,7 +175,9 @@ function CreatingListing() {
 
     !formDataCopy.offer && delete formDataCopy.discountedPrice;
 
-    const docRef = await addDoc(collection(db, "listing"), formDataCopy);
+    // Update Listing
+    const docRef = doc(db, "listing", params.listingId);
+    await updateDoc(docRef, formDataCopy);
     setLoading(false);
     toast.success("Listing saved");
 
@@ -178,6 +212,7 @@ function CreatingListing() {
     }
   };
 
+  //
   useEffect(() => {
     if (isMounted) {
       onAuthStateChanged(auth, (user) => {
@@ -201,7 +236,7 @@ function CreatingListing() {
   return (
     <div className='profile'>
       <header>
-        <p className='pageHeader'>Create a Listing</p>
+        <p className='pageHeader'> Edit Listing</p>
       </header>
 
       <main>
@@ -438,7 +473,7 @@ function CreatingListing() {
             required
           />
           <button type='submit' className='primaryButton createListingButton'>
-            Create Listing
+            Edit Listing
           </button>
         </form>
       </main>
@@ -446,4 +481,4 @@ function CreatingListing() {
   );
 }
 
-export default CreatingListing;
+export default EditListing;
