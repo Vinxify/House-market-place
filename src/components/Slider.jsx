@@ -79,9 +79,13 @@ function Slider() {
                   background: `url(${data.imgUrls[0]})`,
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
-                  objectFit: 'cover',
-                  
-                  height: "auto",
+                  backgroundSize: "cover",
+                  // objectFit: "contain",
+
+                  height: "30vw",
+                  minHeight: "30vh",
+                  // width: "100%",
+                  margin: " 0 auto",
                 }}
               >
                 <p className='swiperSlideText'>{data.name}</p>

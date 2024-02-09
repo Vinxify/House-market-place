@@ -17,6 +17,8 @@ import { toast } from "react-toastify";
 import arrowRight from "../assets/svg/keyboardArrowRightIcon.svg";
 import homeIcon from "../assets/svg/homeIcon.svg";
 import ListingItem from "../components/ListingItem";
+import { SETTIMEOUT_SEC } from "../components/helper/helper_variable";
+import Spinner from "../components/Spinner";
 
 function Profile() {
   const auth = getAuth();
@@ -52,9 +54,10 @@ function Profile() {
         });
 
         setListings(listings);
-        setLoading(false);
       } catch (error) {
-        console.error(error);
+        toast.error("Something went wrong");
+      } finally {
+        setLoading(false);
       }
     };
     fetchUserListings();
@@ -90,13 +93,13 @@ function Profile() {
         await updateDoc(userRef, {
           name,
         });
+        toast.success("successfully update profile");
       }
-
-      toast.success("successfully update profile");
     } catch (err) {
       toast.error("Could not update profile details");
     }
   };
+
   const onChange = (e) => {
     setFormData((prevState) => ({
       ...prevState,

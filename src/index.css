@@ -3,10 +3,6 @@
   box-sizing: border-box;
 }
 
-#root {
-  margin-bottom: 20rem;
-}
-
 body {
   font-family: "Montserrat", sans-serif;
   background-color: #f2f4f8;
@@ -72,15 +68,10 @@ button {
   justify-content: center;
 }
 
-.btn {
-  margin-bottom: 2rem;
-}
-
 button:disabled {
   background-color: #cccccc;
   color: #666666;
   cursor: not-allowed;
-  border: 1px solid #999999;
 }
 
 .removeIcon {
@@ -350,12 +341,12 @@ button:disabled {
 .swiperSlideText {
   color: #ffffff;
   position: absolute;
-  top: 70px;
+  bottom: 0%;
   left: 0;
   font-weight: 600;
   max-width: 90%;
   font-size: 1.25rem;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.6);
   padding: 0.5rem;
 }
 @media (min-width: 1024px) {
@@ -367,7 +358,7 @@ button:disabled {
 .swiperSlidePrice {
   color: #000000;
   position: absolute;
-  top: 14px;
+  bottom: 4rem;
   left: 11px;
   font-weight: 600;
   max-width: 90%;
@@ -683,6 +674,7 @@ button:disabled {
 }
 .profileNameActive {
   background-color: rgba(44, 44, 44, 0.1);
+  padding: 0.1rem;
 }
 
 .profileEmail,
@@ -831,6 +823,8 @@ button:disabled {
   opacity: 0.75;
 }
 
+/* Additional css */
+
 .btn {
   margin-bottom: 5rem;
 }
@@ -838,6 +832,11 @@ button:disabled {
 .container {
   margin: 0 auto;
   max-width: 40rem;
+}
+
+.containerRoot {
+  max-width: 76.8rem;
+  margin: 0 auto 10rem;
 }
 
 @media (max-width: 720px) {
@@ -853,8 +852,10 @@ button:disabled {
 
 .swiperSlideType {
   position: absolute;
-  top: -9%;
+  top: 0;
   right: 0;
+
+  transform: translate(0, -50%);
 
   background-color: #00cc66;
   color: #ffffff;

@@ -23,7 +23,7 @@ import EditListing from "./pages/EditListing";
 
 function App() {
   return (
-    <>
+    <div className='containerRoot'>
       <Router>
         <Routes>
           <Route path='/' element={<Explore />} />
@@ -45,7 +45,7 @@ function App() {
       </Router>
 
       <ToastContainer />
-    </>
+    </div>
   );
 }
 
