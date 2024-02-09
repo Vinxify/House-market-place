@@ -92,12 +92,12 @@ function CreatingListing() {
             // Upload progress tracking
             const progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log("Upload is " + progress + "% done");
+            // console.log("Upload is " + progress + "% done");
           },
           (error) => {
             // Upload error handling
             reject(error);
-            console.error("Error uploading image:", error);
+            // console.error("Error uploading image:", error);
           },
           () => {
             // Upload completed successfully, get download URL

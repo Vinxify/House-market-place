@@ -14,11 +14,18 @@ import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 
 import ListingItem from "../components/ListingItem";
+import Error from "../components/Error";
+import {
+  SETTIMEOUT_SEC,
+  TIMEOUT_SEC,
+} from "../components/helper/helper_variable";
+import { timeout } from "../components/helper/timeOut";
 
 function Offers() {
   const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastFetchedListing, setLastFetchedListing] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const params = useParams();
 
@@ -38,7 +45,10 @@ function Offers() {
         );
 
         // Execute query
-        const querySnap = await getDocs(q);
+        const querySnap = await Promise.race([
+          timeout(TIMEOUT_SEC),
+          getDocs(q),
+        ]);
 
         // for pagination
         const lastVisible = querySnap.docs[querySnap.docs.length - 1];
@@ -54,10 +64,18 @@ function Offers() {
         });
 
         setListings(listings);
-        setLoading(false);
       } catch (error) {
         console.error(error);
-        toast.error("Could not fetch listings");
+        if (error.message.includes("Request took too long")) {
+          toast.error("Bad internet connection");
+          setErrorMessage(error.message);
+        } else {
+          toast.error("Could not fetch listings");
+        }
+      } finally {
+        setTimeout(() => {
+          setLoading(false);
+        }, SETTIMEOUT_SEC * 1000);
       }
     };
 
@@ -108,6 +126,8 @@ function Offers() {
         <p className='pageHeader'>Offers</p>
       </header>
 
+      {errorMessage && <Error errorMessage={errorMessage} />}
+
       {loading ? (
         <Spinner />
       ) : listings && listings.length > 0 ? (
@@ -126,11 +146,11 @@ function Offers() {
           <br />
           <br />
 
-          {lastFetchedListing && (
+          {/* {lastFetchedListing && (
             <p className='loadMore' onClick={() => onfetchMoreListings()}>
               Load More
             </p>
-          )}
+          )} */}
         </>
       ) : (
         <p> There are no current offers</p>

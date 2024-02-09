@@ -13,7 +13,7 @@ function Explore() {
       </header>
 
       <main>
-        <Slider/>
+        <Slider />
 
         <p className='exploreCategoryHeading'>Category</p>
         <div className='exploreCategories'>

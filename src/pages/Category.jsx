@@ -14,6 +14,8 @@ import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 
 import ListingItem from "../components/ListingItem";
+import { timeout } from "../components/helper/timeOut";
+import { TIMEOUT_SEC } from "../components/helper/helper_variable";
 
 function Category() {
   const [listings, setListings] = useState(null);
@@ -37,7 +39,7 @@ function Category() {
         );
 
         // Execute query
-        const querySnap = await getDocs(q);
+        const querySnap = await Promise.race([timeout(TIMEOUT_SEC), getDocs(q)]);
         const lastVisible = querySnap.docs[querySnap.docs.length - 1];
 
         setLastFetchedListing(lastVisible);
@@ -52,9 +54,15 @@ function Category() {
         });
 
         setListings(listings);
-        setLoading(false);
       } catch (error) {
-        toast.error("Could not fetch listings");
+        console.error(error);
+        if (error.message.includes("Request took too long")) {
+          toast.error("Service timeout, check your internet connection");
+        } else {
+          toast.error("Could not fetch listings");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -120,6 +128,7 @@ function Category() {
                   key={listing.id}
                   listing={listing.data}
                   id={listing.id}
+                  
                 />
               ))}
             </ul>

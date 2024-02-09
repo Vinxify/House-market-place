@@ -14,6 +14,7 @@ import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/bundle";
+import { SETTIMEOUT_SEC } from "../components/helper/helper_variable";
 
 function Listing() {
   const [listing, setListing] = useState(null);
@@ -43,7 +44,7 @@ function Listing() {
     setShareLinkCopied(true);
     setTimeout(() => {
       setShareLinkCopied(false);
-    }, 2000);
+    }, SETTIMEOUT_SEC * 1000);
   };
 
   if (loading) {
@@ -53,14 +54,8 @@ function Listing() {
     <main>
       <Swiper
         slidesPerView={1}
-        modules={[Navigation, Pagination, Scrollbar, A11y]}
-        pagination={{ clickable: true }}
-        onSlideChange={() => {
-          /*...*/
-        }}
-        onReachEnd={() => {
-          /*...*/
-        }}
+        modules={[Navigation, Pagination]}
+        pagination={true}
       >
         {listing.imgUrls.map((url, index) => (
           <SwiperSlide key={index}>

@@ -35,9 +35,10 @@ function Slider() {
           });
         });
         setListings(listings);
-        setLoading(false);
       } catch (error) {
         toast.error("An error occured");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -48,7 +49,7 @@ function Slider() {
     return <Spinner />;
   }
 
-  if (listings.length === 0) {
+  if (listings?.length === 0) {
     return <></>;
   }
   return (
@@ -73,12 +74,14 @@ function Slider() {
               onClick={() => navigate(`/category/${data.type}/${id}`)}
             >
               <div
+                className='sliderImageContainer '
                 style={{
                   background: `url(${data.imgUrls[0]})`,
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
-                  backgroundSize: "cover",
-                  height: "25vh",
+                  objectFit: 'cover',
+                  
+                  height: "auto",
                 }}
               >
                 <p className='swiperSlideText'>{data.name}</p>
@@ -86,6 +89,7 @@ function Slider() {
                   ${data.discountedPrice ?? data.regularPrice}{" "}
                   {data.type === "rent" && "/ month"}
                 </p>
+                <p className='swiperSlideType'> For {data.type}</p>
               </div>
             </SwiperSlide>
           ))}

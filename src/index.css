@@ -3,8 +3,8 @@
   box-sizing: border-box;
 }
 
-html::-webkit-scrollbar {
-  display: none;
+#root {
+  margin-bottom: 20rem;
 }
 
 body {
@@ -70,6 +70,17 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.btn {
+  margin-bottom: 2rem;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+  border: 1px solid #999999;
 }
 
 .removeIcon {
@@ -818,4 +829,45 @@ button {
   margin-left: 1rem;
   font-size: 0.8rem;
   opacity: 0.75;
+}
+
+.btn {
+  margin-bottom: 5rem;
+}
+
+.container {
+  margin: 0 auto;
+  max-width: 40rem;
+}
+
+@media (max-width: 720px) {
+  .formLatLng {
+    flex-direction: column;
+  }
+}
+
+.sliderImageContainer {
+  position: relative;
+  height: 100%;
+}
+
+.swiperSlideType {
+  position: absolute;
+  top: -9%;
+  right: 0;
+
+  background-color: #00cc66;
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 0.1rem 0.2rem;
+}
+
+.errorContainer {
+  font-size: 2rem;
+  margin: 0 auto;
+  padding: 9.6rem 4.8rem;
+
+  display: flex;
+  justify-items: center;
+  align-items: center;
 }

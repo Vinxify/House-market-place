@@ -17,8 +17,18 @@ import ArrowRightIcon from "../assets/svg/keyboardArrowRightIcon.svg?react";
 import visibilityIcon from "../assets/svg/visibilityIcon.svg";
 import OAuth from "../components/OAuth";
 
+import { timeout } from "../components/helper/timeOut";
+import Spinner from "../components/Spinner";
+import Button from "../components/Button";
+import {
+  SETTIMEOUT_SEC,
+  TIMEOUT_SEC,
+} from "../components/helper/helper_variable";
+
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [btnDisabled, setBtnDisabled] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -30,6 +40,13 @@ function SignUp() {
   const navigate = useNavigate();
 
   const onChange = (e) => {
+    //  Set btn disabled
+    if (name === "" || email === "" || password === "") {
+      setBtnDisabled(true);
+    } else {
+      setBtnDisabled(false);
+    }
+
     setFormData((prevState) => ({
       ...prevState,
       [e.target.id]: e.target.value,
@@ -39,13 +56,13 @@ function SignUp() {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const auth = getAuth();
 
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await Promise.race([
+        timeout(TIMEOUT_SEC),
+        createUserWithEmailAndPassword(auth, email, password),
+      ]);
 
       const user = userCredential.user;
       updateProfile(auth.currentUser, {
@@ -60,15 +77,42 @@ function SignUp() {
 
       navigate("/");
     } catch (err) {
-      toast.error("Something went wrong with the registration");
+      console.error(err);
+      if (err.message.includes(" (auth/email-already-in-use)")) {
+        toast.error("Email already used");
+      } else if (err.message.includes("Request")) {
+        toast.error(`${err.message}, Check your internet connection!!!`);
+      } else if (err.message.includes("(auth/invalid-email)")) {
+        toast.error("Invalid Email");
+      } else if (
+        err.message.includes("Password should be at least 6 characters")
+      ) {
+        toast.error("Password should be more than six characters");
+      } else {
+        toast.error("Something went wrong with the registration");
+      }
+    } finally {
+      setBtnDisabled(true);
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+      });
+      setTimeout(() => {
+        setLoading(false);
+      }, SETTIMEOUT_SEC * 1000);
     }
   };
 
+  if (loading) {
+    return <Spinner />;
+  }
+
   return (
-    <>
+    <div className='container'>
       <div className='pageContainer'>
         <header>
-          <p className='pageHeader'>Welcome back</p>
+          <p className='pageHeader'>Welcome </p>
         </header>
 
         <main>
@@ -108,17 +152,13 @@ function SignUp() {
               />
             </div>
 
-            <Link to='/forgot-password' className='forgotPasswordLink'>
-              Forgot Password
-            </Link>
-
-            <div className='signUpBar'>
-              <p className='signUpText'>Sign In</p>
-              <button className='signUpButton'>
-                <ArrowRightIcon fill='#ffffff' width='34px' height='34px' />
-              </button>
-            </div>
+            <Button onSubmit={onSubmit} btnDisabled={btnDisabled}>
+              Sign up
+            </Button>
           </form>
+          <Link to='/forgot-password' className='forgotPasswordLink'>
+            Forgot Password?
+          </Link>
 
           <OAuth />
           <Link to='/sign-in' className='registerLink'>
@@ -126,7 +166,7 @@ function SignUp() {
           </Link>
         </main>
       </div>
-    </>
+    </div>
   );
 }
 
